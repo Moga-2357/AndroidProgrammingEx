@@ -17,7 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
+public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder>
+{
     private final ArrayList<TodoItem> mTodoItems;  // 할일 항목들을 저장하는 리스트
     private final Context mContext;  // 안드로이드 시스템과 상호작용할 Context 객체
     private final DBHelper mDBHelper;  // 데이터베이스 작업을 담당하는 DBHelper 객체

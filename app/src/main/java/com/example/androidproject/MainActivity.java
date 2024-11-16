@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.example.androidproject.CalendarView;
+import com.example.androidproject.CalendarViewFragment;
 import com.example.androidproject.ListView;
 import com.example.androidproject.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
                 } else if (itemId == R.id.nav_calendar) {
                     // 기존 Fragment 제거 후 새 CalendarView Fragment로 교체
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.frame_container, new CalendarView())  // CalendarView Fragment 교체
+                            .replace(R.id.frame_container, new CalendarViewFragment())  // CalendarView Fragment 교체
                             .addToBackStack(null)                                // 백스택에 추가 (뒤로가기 버튼 사용 가능)
                             .commit();
                 }

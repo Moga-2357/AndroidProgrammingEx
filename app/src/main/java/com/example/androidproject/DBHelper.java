@@ -42,6 +42,46 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
+    // 특정 날짜에 맞는 Todo 리스트 가져오기
+    public ArrayList<TodoItem> getTodoListForDate(String date) {
+        ArrayList<TodoItem> todoItems = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            // 특정 날짜에 해당하는 일정 가져오기 (completionDate와 일치하는 일정)
+            String query = "SELECT * FROM TodoList WHERE completionDate = ?";
+            cursor = db.rawQuery(query, new String[]{date});
+
+            if (cursor != null && cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                    String title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
+                    String content = cursor.getString(cursor.getColumnIndexOrThrow("content"));
+                    String alarmTime = cursor.getString(cursor.getColumnIndexOrThrow("alarmTime"));
+                    String completionDate = cursor.getString(cursor.getColumnIndexOrThrow("completionDate"));
+
+                    TodoItem todoItem = new TodoItem();
+                    todoItem.setId(id);
+                    todoItem.setTitle(title);
+                    todoItem.setContent(content);
+                    todoItem.setAlarmTime(alarmTime);
+                    todoItem.setCompletionDate(completionDate);
+                    todoItems.add(todoItem);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DBHelper", "Error while fetching todo list for date", e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return todoItems;
+    }
+
     // getTodoList 메소드에서 Cursor 자원 관리를 try-finally 블록으로 수정
     public ArrayList<TodoItem> getTodoList() {
         ArrayList<TodoItem> todoItems = new ArrayList<>();
