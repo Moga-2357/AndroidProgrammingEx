@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_list"
+        android:title="List"
+        android:icon="@drawable/list_view_ex"/>
+
+    <item
+        android:id="@+id/nav_calendar"
+        android:title="Calendar"
+        android:icon="@drawable/calendar_ex"/>
+
+</menu>
