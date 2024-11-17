@@ -1,6 +1,8 @@
 package com.example.androidproject;
 
+import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class ListView extends Fragment
 {
@@ -81,6 +84,26 @@ public class ListView extends Fragment
         EditText et_alarm_time = dialog.findViewById(R.id.et_alarm_time);
         Button btn_ok = dialog.findViewById(R.id.btn_ok);
 
+        // 완료 날짜 클릭 시 날짜 선택 다이얼로그 표시
+        et_due_date.setFocusable(false);
+        et_due_date.setClickable(true);
+        et_due_date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(et_due_date);
+            }
+        });
+
+        // 알람 시간 클릭 시 시간 선택 다이얼로그 표시
+        et_alarm_time.setFocusable(false);
+        et_alarm_time.setClickable(true);
+        et_alarm_time.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimePickerDialog(et_alarm_time);
+            }
+        });
+
         // 다이얼로그에서 확인 버튼을 눌렀을 때
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,6 +154,43 @@ public class ListView extends Fragment
 
         // 다이얼로그 보이기
         dialog.show();
+    }
+
+    // 날짜 선택 다이얼로그 표시
+    private void showDatePickerDialog(EditText et_due_date) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                getContext(),
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    // 날짜 형식: YYYY-MM-DD
+                    String formattedDate = String.format("%d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay);
+                    et_due_date.setText(formattedDate);
+                },
+                year, month, day
+        );
+        datePickerDialog.show();
+    }
+
+    // 시간 선택 다이얼로그 표시
+    private void showTimePickerDialog(EditText et_alarm_time) {
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(
+                getContext(),
+                (view, selectedHour, selectedMinute) -> {
+                    // 시간 형식: HH:MM
+                    String formattedTime = String.format("%02d:%02d", selectedHour, selectedMinute);
+                    et_alarm_time.setText(formattedTime);
+                },
+                hour, minute, true
+        );
+        timePickerDialog.show();
     }
 
     private void loadTodoListFromDB() {

@@ -139,8 +139,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // UpdateTodo 메소드에서 SQL 파라미터 바인딩을 직접 하지 않고 SQLiteStatement 사용
-    public void UpdateTodo(String _title, String _content, String _alarmTime, String _completionDate, String _beforeCompletionDate) {
-        // null 값 체크 후 빈 문자열로 처리
+    public void UpdateTodo(String _title, String _content, String _alarmTime, String _completionDate, int _id) {
         if (_title == null) _title = "";
         if (_content == null) _content = "";
         if (_alarmTime == null) _alarmTime = "";
@@ -150,13 +149,13 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteStatement statement = null;
         try {
             db = getWritableDatabase();
-            String sql = "UPDATE TodoList SET title=?, content=?, alarmTime=?, completionDate=? WHERE completionDate=?";
+            String sql = "UPDATE TodoList SET title=?, content=?, alarmTime=?, completionDate=? WHERE id=?";
             statement = db.compileStatement(sql);
             statement.bindString(1, _title);
             statement.bindString(2, _content);
             statement.bindString(3, _alarmTime);
             statement.bindString(4, _completionDate);
-            statement.bindString(5, _beforeCompletionDate);
+            statement.bindLong(5, _id);  // id로 업데이트
             statement.executeUpdateDelete();  // 업데이트 실행
         } catch (Exception e) {
             e.printStackTrace();  // 예외 발생 시 출력

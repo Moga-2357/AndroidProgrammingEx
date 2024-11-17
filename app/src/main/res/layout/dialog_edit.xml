@@ -83,8 +83,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:ems="10"
-            android:inputType="date"
-            android:hint="2024-00-00"
+            android:hint="YYYY-MM-DD"
+            android:focusable="false"
+            android:clickable="true"
             app:layout_constraintStart_toStartOf="@+id/tv_des_due_date"
             app:layout_constraintTop_toBottomOf="@+id/tv_des_due_date"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -105,8 +106,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:ems="10"
-            android:inputType="time"
-            android:hint="hh:mm"
+            android:hint="HH:MM"
+            android:focusable="false"
+            android:clickable="true"
             app:layout_constraintStart_toStartOf="@+id/tv_des_alarm_time"
             app:layout_constraintTop_toBottomOf="@+id/tv_des_alarm_time"
             app:layout_constraintEnd_toEndOf="parent" />

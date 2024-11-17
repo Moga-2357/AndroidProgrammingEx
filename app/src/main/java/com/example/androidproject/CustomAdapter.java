@@ -1,15 +1,19 @@
 package com.example.androidproject;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -106,12 +110,53 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
             EditText et_title = dialog.findViewById(R.id.et_title);
             EditText et_content = dialog.findViewById(R.id.et_content);
             EditText et_completionDate = dialog.findViewById(R.id.et_due_date);  // 완료 날짜 입력 필드 추가
+            EditText et_alarm_time = dialog.findViewById(R.id.et_alarm_time);
             Button btn_ok = dialog.findViewById(R.id.btn_ok);
 
-            // 기존 제목, 내용, 완료 날짜로 다이얼로그 필드 초기화
+            // 기존 제목, 내용, 날짜, 시간으로 다이얼로그 필드 초기화
             et_title.setText(todoItem.getTitle());
             et_content.setText(todoItem.getContent());
             et_completionDate.setText(todoItem.getCompletionDate());  // 기존 완료 날짜 표시
+            et_alarm_time.setText(todoItem.getAlarmTime());
+
+            // 날짜 입력 부분 클릭 시 DatePickerDialog 사용
+            et_completionDate.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String date = et_completionDate.getText().toString();
+                    String[] splitDate = date.split("-");
+                    int year = Integer.parseInt(splitDate[0]);
+                    int month = Integer.parseInt(splitDate[1]) - 1; // 월은 0부터 시작
+                    int day = Integer.parseInt(splitDate[2]);
+
+                    DatePickerDialog datePickerDialog = new DatePickerDialog(mContext, new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                            et_completionDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                        }
+                    }, year, month, day);
+                    datePickerDialog.show();
+                }
+            });
+
+            // 시간 입력 부분 클릭 시 TimePickerDialog 사용
+            et_alarm_time.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String time = et_alarm_time.getText().toString();
+                    String[] splitTime = time.split(":");
+                    int hour = Integer.parseInt(splitTime[0]);
+                    int minute = Integer.parseInt(splitTime[1]);
+
+                    TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
+                        @Override
+                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                            et_alarm_time.setText(String.format("%02d:%02d", hourOfDay, minute));
+                        }
+                    }, hour, minute, true);
+                    timePickerDialog.show();
+                }
+            });
 
             // 수정된 제목, 내용, 완료 날짜를 저장하는 버튼 클릭 리스너
             btn_ok.setOnClickListener(new View.OnClickListener() {
@@ -121,16 +166,17 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
                     String newTitle = et_title.getText().toString();
                     String newContent = et_content.getText().toString();
                     String newCompletionDate = et_completionDate.getText().toString();  // 수정된 완료 날짜
+                    String newAlarmTime = et_alarm_time.getText().toString();  // 수정된 알람 시간 받아오기
 
                     // DB에 수정된 내용 업데이트
-                    String beforeCompletionDate = todoItem.getCompletionDate(); // 기존 완료 날짜를 가져와서 업데이트 시 사용
-                    String alarmTime = todoItem.getAlarmTime(); // 알람 시간은 변경하지 않음
-                    mDBHelper.UpdateTodo(newTitle, newContent, alarmTime, newCompletionDate, beforeCompletionDate);
+                    int todoId = todoItem.getId();  // TodoItem에서 ID 가져오기
+                    mDBHelper.UpdateTodo(newTitle, newContent, newAlarmTime, newCompletionDate, todoId);
 
                     // UI 업데이트
                     todoItem.setTitle(newTitle);
                     todoItem.setContent(newContent);
                     todoItem.setCompletionDate(newCompletionDate);  // 완료 날짜 수정
+                    todoItem.setAlarmTime(newAlarmTime);  // 수정된 알람 시간도 반영
 
                     // RecyclerView 갱신
                     notifyItemChanged(curPos);
