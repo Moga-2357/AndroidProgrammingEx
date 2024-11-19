@@ -8,4 +8,5 @@
     <color name="colorPink">#FFB4AD</color>
     <color name="colorViolet">#BD98FF</color>
     <color name="colorBrown">#A68B83</color>
+    <color name="highlight_color">#FFEB3B</color> <!-- 노란색 강조 -->
 </resources>

@@ -4,7 +4,13 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <!-- 정확한 알람을 위한 권한 추가 -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -26,11 +32,11 @@
         <receiver android:name=".AlarmReceiver"
             android:enabled="true"
             android:exported="false">
-            <!-- 알람을 받을 때 필요한 인텐트 필터 (예: 특정 시간에 알람을 받도록 설정) -->
             <intent-filter>
-                <action android:name="com.example.yourapp.ALARM_TRIGGER" />
+                <action android:name="com.example.androidproject.ALARM_ACTION" />
             </intent-filter>
         </receiver>
+
     </application>
 
 </manifest>

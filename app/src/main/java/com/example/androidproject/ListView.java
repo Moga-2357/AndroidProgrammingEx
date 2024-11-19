@@ -1,9 +1,16 @@
 package com.example.androidproject;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +20,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -104,6 +112,8 @@ public class ListView extends Fragment
             }
         });
 
+
+
         // 다이얼로그에서 확인 버튼을 눌렀을 때
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,6 +148,9 @@ public class ListView extends Fragment
                     // 어댑터를 통해 RecyclerView에 새 항목 추가
                     mAdapter.addItem(item);
                     mRv_todo.smoothScrollToPosition(0);  // 새로 추가된 항목으로 스크롤
+
+                    // 알람 설정 호출 (알람 시간, 제목, 내용)
+                    setAlarm(alarmTime, title, content);
 
                     // 다이얼로그 닫기
                     dialog.dismiss();
@@ -174,7 +187,6 @@ public class ListView extends Fragment
         );
         datePickerDialog.show();
     }
-
     // 시간 선택 다이얼로그 표시
     private void showTimePickerDialog(EditText et_alarm_time) {
         Calendar calendar = Calendar.getInstance();
@@ -192,6 +204,79 @@ public class ListView extends Fragment
         );
         timePickerDialog.show();
     }
+
+    // 시간 선택 다이얼로그 표시
+    private void setAlarm(String alarmTime, String title, String content) {
+        try {
+            // 알람 시간 출력
+            Log.d("AlarmManager", "Setting alarm with time: " + alarmTime);
+
+            // 알람 시간이 null이거나 비어있는 경우 체크
+            if (alarmTime == null || alarmTime.isEmpty()) {
+                Log.e("AlarmManager", "Invalid alarm time: " + alarmTime);
+                Toast.makeText(getContext(), "알람 시간이 유효하지 않습니다.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // 시간 파싱
+            String[] timeParts = alarmTime.split(":");
+            if (timeParts.length != 2) {
+                Log.e("AlarmManager", "Invalid time format: " + alarmTime);
+                Toast.makeText(getContext(), "알람 시간이 잘못된 형식입니다.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int hour = Integer.parseInt(timeParts[0]);
+            int minute = Integer.parseInt(timeParts[1]);
+
+            Log.d("AlarmManager", "Parsed time: hour=" + hour + ", minute=" + minute);
+
+            // 알람 시간 설정
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, hour);
+            calendar.set(Calendar.MINUTE, minute);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+
+            // 알람 시간 이전일 경우, 다음 날로 설정
+            if (calendar.before(Calendar.getInstance())) {
+                calendar.add(Calendar.DATE, 1);  // 다음 날로 설정
+                Log.d("AlarmManager", "Alarm time was in the past, setting to next day.");
+            }
+
+            // 알람 트리거 시간 확인
+            Log.d("AlarmManager", "Alarm is set for: " + calendar.getTime().toString());
+
+            // Intent 설정
+            Intent intent = new Intent(getContext(), AlarmReceiver.class);
+            intent.putExtra("title", title);
+            intent.putExtra("content", content);
+
+            // PendingIntent 생성
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                    requireContext(),
+                    0,  // requestCode
+                    intent,
+                    PendingIntent.FLAG_IMMUTABLE
+            );
+
+            // AlarmManager 설정
+            AlarmManager alarmManager = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
+            if (alarmManager != null) {
+                long triggerAtMillis = calendar.getTimeInMillis();
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
+                Log.d("AlarmManager", "Alarm set for: " + triggerAtMillis);
+            } else {
+                Log.d("AlarmManager", "AlarmManager is null!");
+                Toast.makeText(getContext(), "알람 설정에 실패했습니다.", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            // 예외 발생 시, 어떤 예외가 발생했는지 로그에 남깁니다.
+            Log.e("AlarmManager", "Error while setting alarm", e);
+            Toast.makeText(getContext(), "알람 설정에 실패했습니다.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     private void loadTodoListFromDB() {
         // DBHelper에서 할 일 목록 가져오기
